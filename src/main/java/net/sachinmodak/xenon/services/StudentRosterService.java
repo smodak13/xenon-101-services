@@ -48,4 +48,15 @@ public class StudentRosterService extends StatefulService {
 
         startPost.complete();
     }
+
+    @Override
+    public void handleDelete(Operation operation) {
+        operation.complete();
+    }
+    //    @Override
+    //    public void handleGet(Operation get) {
+    //        Query query = Query.Builder.create().addKindFieldClause(StudentRosterReport.class).build();
+    //        QueryTask queryTask = QueryTask.Builder.create().addOption(QueryOption.EXPAND_CONTENT).
+    //                orderAscending(StudentRosterReport.FIELD_NAME T)
+    //    }
 }
