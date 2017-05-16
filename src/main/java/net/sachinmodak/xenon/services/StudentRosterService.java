@@ -14,6 +14,7 @@ public class StudentRosterService extends StatefulService {
      * State representing student roster for name and zip code.
      */
     public static class StudentRosterReport extends ServiceDocument {
+        public static final String FIELD_ZIP_CODE = "zipCode";
 
         @Documentation(description = "Student id")
         public String id;

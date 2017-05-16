@@ -2,7 +2,12 @@ package net.sachinmodak.xenon.services;
 
 import com.vmware.xenon.common.Operation;
 import com.vmware.xenon.common.StatelessService;
+import com.vmware.xenon.services.common.QueryTask;
+import com.vmware.xenon.services.common.QueryTask.Query;
+import com.vmware.xenon.services.common.QueryTask.QuerySpecification.QueryOption;
 import com.vmware.xenon.services.common.ServiceUriPaths;
+
+import net.sachinmodak.xenon.services.StudentRosterService.StudentRosterReport;
 
 public class ZipCodeStatelessService extends StatelessService {
 
@@ -19,9 +24,22 @@ public class ZipCodeStatelessService extends StatelessService {
     @Override
     public void handleGet(Operation get) {
         ZipRequest zipRequest = get.getBody(ZipRequest.class);
-        ZipResponse zipResponse = new ZipResponse();
-        zipResponse.zipCode = zipRequest.zipCode;
-        get.setBody(zipResponse);
-        get.complete();
+        String zipCode = zipRequest.zipCode;
+
+        Query query = Query.Builder.create().addKindFieldClause(StudentRosterReport.class)
+                .addFieldClause(StudentRosterReport.FIELD_ZIP_CODE, zipCode)
+                .build();
+        QueryTask queryTask = QueryTask.Builder.createDirectTask()
+                .addOption(QueryOption.EXPAND_CONTENT)
+                .setQuery(query)
+                .build();
+        Operation.createPost(this, ServiceUriPaths.CORE_QUERY_TASKS)
+                .setBody(queryTask)
+                .setCompletion((o, e) -> {
+                    QueryTask rsp = o.getBody(QueryTask.class);
+                    System.out.println("data:" + rsp);
+                    get.setBody(rsp.results.documents);
+                    get.complete();
+                }).sendWith(this);
     }
 }
